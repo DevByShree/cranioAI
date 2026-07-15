@@ -1,0 +1,210 @@
+.viz-page {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  height: calc(100vh - 64px - 48px);
+}
+
+/* ---------- Canvas ---------- */
+.viz-canvas-wrap {
+  position: relative;
+  background: linear-gradient(135deg, var(--bg-dark), var(--secondary));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+}
+
+.viz-canvas-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.viz-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.viz-control-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background var(--transition);
+}
+
+.viz-control-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.viz-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  color: var(--text-white);
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* ---------- Info Panel ---------- */
+.viz-info-panel {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.viz-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.viz-info-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.viz-info-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--primary-pale);
+  padding: 3px 10px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.viz-info-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.viz-info-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* ---------- Metrics ---------- */
+.viz-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.viz-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-main);
+}
+
+.viz-metric-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.viz-metric-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ---------- Landmark Info ---------- */
+.viz-landmark-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-main);
+  margin-bottom: 20px;
+}
+
+.viz-landmark-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.viz-landmark-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.viz-landmark-dot.green { background: var(--accent-light); }
+.viz-landmark-dot.accent { background: var(--accent); }
+
+/* ---------- Export ---------- */
+.viz-export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--text-white);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: auto;
+  transition: transform var(--transition);
+}
+
+.viz-export-btn:hover { transform: translateY(-1px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .viz-page {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .viz-canvas-wrap {
+    height: 400px;
+  }
+}
