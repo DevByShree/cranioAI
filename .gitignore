@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv/
+
+# Django Database
+db.sqlite3
+*.sqlite3
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Media Uploads & Generated Files
+media/uploads/
+media/generated_images/
+media/generated_models/
+
+#images
+.png
+.jpeg
+
+# 3D Files
+*.glb
+*.gltf
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
