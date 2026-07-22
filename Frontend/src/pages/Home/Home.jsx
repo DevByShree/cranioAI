@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom'
 import './Home.css'
 import faceImg from '../../assets/image.png'
 import logoImg from '../../assets/logo.png'
+import asymmetry from '../../assets/asymmetry.png'
+import symmetry from '../../assets/symmetry.png'
+import testimonial from '../../assets/testimonial.png'
+import quote from '../../assets/quote.png'
+import arrowright from '../../assets/arrow-right-32.png'
+import arrowleft from '../../assets/arrow-back-32.png'
+
+import FaceModel from "../../components/FaceModel";
 
 const features = [
   { icon: 'scan', title: 'AI-Powered Analysis', desc: 'Advanced facial recognition detects 68+ landmark points for precise symmetry measurement.' },
@@ -40,19 +48,26 @@ const iconPaths = {
 }
 
 export default function Home() {
-  const [scrolled, setScrolled] = useState(false)
+  // const [scrolled, setScrolled] = useState(false)
   const [activeTestimonial, setActiveTestimonial] = useState(0)
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const nextTestimonial = () => {
+    setActiveTestimonial((prev) =>
+      prev === testimonials.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevTestimonial = () => {
+    setActiveTestimonial((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+  };
 
   return (
     <div className="home">
       {/* ---------- Navbar ---------- */}
-      <nav className={`home-nav ${scrolled ? 'scrolled' : ''}`}>
+      {/* <nav className={`home-nav ${scrolled ? 'scrolled' : ''}`}>  */}
+      <nav className="home-nav">
         <div className="home-nav-inner">
           <Link to="/" className="home-brand">
             <div className="home-brand-logo">
@@ -115,13 +130,13 @@ export default function Home() {
 
           <div className="home-hero-right">
             {/* <div className="home-hero-img-wrap"> */}
-              {/* </div> */}
-              {/* <div className="home-scan-line" />
+            {/* </div> */}
+            {/* <div className="home-scan-line" />
               <div className="home-scan-dot top-left" />
               <div className="home-scan-dot top-right" />
               <div className="home-scan-dot bottom-left" />
               <div className="home-scan-dot bottom-right" /> */}
-              <img src={faceImg} alt="Face analysis" className="home-hero-img" />
+            <img src={faceImg} alt="Face analysis" className="home-hero-img" />
 
 
             <div className='home-float-cards' >
@@ -165,7 +180,7 @@ export default function Home() {
         <div className="home-section-head">
           <span className="home-section-tag">Why Choose CranioAI</span>
           <h2 className="home-section-title">Advanced Technology, <span className="home-text-green">Real Results</span></h2>
-          <p className="home-section-desc">Cutting-edge AI meets facial aesthetics in one powerful platform</p>
+          {/* <p className="home-section-desc">Cutting-edge AI meets facial aesthetics in one powerful platform</p> */}
         </div>
         <div className="home-feature-grid">
           {features.map((f) => (
@@ -187,7 +202,7 @@ export default function Home() {
         <div className="home-section-head">
           <span className="home-section-tag">How It Works</span>
           <h2 className="home-section-title">Simple Process, <span className="home-text-green">Powerful Insights</span></h2>
-          <p className="home-section-desc">Get your facial symmetry analysis in four easy steps</p>
+          {/* <p className="home-section-desc">Get your facial symmetry analysis in four easy steps</p> */}
         </div>
         <div className="home-steps">
           {steps.map((s, i) => (
@@ -205,8 +220,8 @@ export default function Home() {
       <section className="home-section" id="about">
         <div className="home-viz-card">
           <div className="home-viz-left">
-            <span className="home-section-tag">3D Visualization</span>
-            <h2 className="home-section-title">See Your Face <span className="home-text-green">In 3D</span></h2>
+            {/* <span className="home-section-tag">3D Visualization</span> */}
+            <h2 className="home-section-title" style={{ color: "white" }}>3D Face<div className="home-text-green" style={{ color: "var(--accent)" }}>Visualiztion</div></h2>
             <p className="home-section-desc">
               Explore your facial structure from every angle with our interactive 3D modeling technology.
             </p>
@@ -222,43 +237,21 @@ export default function Home() {
           </div>
           <div className="home-viz-center">
             <div className="home-viz-face">
-              <svg viewBox="0 0 200 240" width="100%" height="100%">
-                <ellipse cx="100" cy="120" rx="70" ry="100" fill="none" stroke="rgba(108,240,174,0.4)" strokeWidth="1" />
-                <ellipse cx="100" cy="120" rx="55" ry="85" fill="none" stroke="rgba(108,240,174,0.3)" strokeWidth="1" />
-                <ellipse cx="100" cy="120" rx="40" ry="65" fill="none" stroke="rgba(108,240,174,0.2)" strokeWidth="1" />
-                <line x1="100" y1="20" x2="100" y2="220" stroke="rgba(108,240,174,0.5)" strokeWidth="1" strokeDasharray="3 3" />
-                <line x1="30" y1="120" x2="170" y2="120" stroke="rgba(108,240,174,0.5)" strokeWidth="1" strokeDasharray="3 3" />
-                <circle cx="80" cy="95" r="5" fill="rgba(108,240,174,0.6)" />
-                <circle cx="120" cy="95" r="5" fill="rgba(108,240,174,0.6)" />
-                <path d="M 90 140 Q 100 150 110 140" fill="none" stroke="rgba(108,240,174,0.6)" strokeWidth="1.5" />
-                <path d="M 85 165 Q 100 175 115 165" fill="none" stroke="rgba(108,240,174,0.6)" strokeWidth="1.5" />
-              </svg>
+              <div className="home-viz-center">
+                <div className="home-viz-face">
+                  <FaceModel />
+                </div>
+              </div>
             </div>
           </div>
           <div className="home-viz-right">
             <div className="home-viz-compare">
               <div className="home-viz-compare-label">Before</div>
-              <div className="home-viz-compare-face">
-                <svg viewBox="0 0 100 120" width="100%" height="100%">
-                  <ellipse cx="50" cy="60" rx="35" ry="50" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" />
-                  <circle cx="38" cy="48" r="3" fill="var(--text-muted)" />
-                  <circle cx="62" cy="50" r="3" fill="var(--text-muted)" />
-                  <path d="M 42 75 Q 50 80 58 75" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <div className="home-viz-compare-score">72%</div>
+              <img src={asymmetry} alt="Logo" />
             </div>
             <div className="home-viz-compare after">
               <div className="home-viz-compare-label">After</div>
-              <div className="home-viz-compare-face">
-                <svg viewBox="0 0 100 120" width="100%" height="100%">
-                  <ellipse cx="50" cy="60" rx="35" ry="50" fill="none" stroke="var(--accent)" strokeWidth="1.5" />
-                  <circle cx="38" cy="48" r="3" fill="var(--accent)" />
-                  <circle cx="62" cy="48" r="3" fill="var(--accent)" />
-                  <path d="M 42 75 Q 50 80 58 75" fill="none" stroke="var(--accent)" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <div className="home-viz-compare-score green">89%</div>
+              <img src={symmetry} alt="Logo" />
             </div>
           </div>
         </div>
@@ -279,16 +272,19 @@ export default function Home() {
       {/* ---------- Testimonials ---------- */}
       <section className="home-section" id="testimonials">
         <div className="home-section-head">
-          <span className="home-section-tag">Testimonials</span>
-          <h2 className="home-section-title">What Our <span className="home-text-green">Users Say</span></h2>
+          {/* <span className="home-section-tag">Testimonials</span> */}
+          <h2 className="home-section-title home-section-tag">What Our <span className="home-text-green">Users Say</span></h2>
         </div>
         <div className="home-testimonial">
-          <div className="home-testimonial-quote">&ldquo;{testimonials[activeTestimonial].quote}&rdquo;</div>
-          <div className="home-testimonial-author">
-            <div className="home-testimonial-avatar">{testimonials[activeTestimonial].name.charAt(0)}</div>
-            <div>
-              <div className="home-testimonial-name">{testimonials[activeTestimonial].name}</div>
-              <div className="home-testimonial-role">{testimonials[activeTestimonial].role}</div>
+          <div className='home-testimonial-left' >
+            <img src={quote} alt="double qoute" />
+            <div className="home-testimonial-quote">{testimonials[activeTestimonial].quote}</div>
+            <div className="home-testimonial-author">
+              <div className="home-testimonial-avatar">{testimonials[activeTestimonial].name.charAt(0)}</div>
+              <div>
+                <div className="home-testimonial-name">{testimonials[activeTestimonial].name}</div>
+                <div className="home-testimonial-role">{testimonials[activeTestimonial].role}</div>
+              </div>
             </div>
           </div>
           <div className="home-testimonial-dots">
@@ -300,14 +296,20 @@ export default function Home() {
               />
             ))}
           </div>
+          <img className='img-home-testimonial' src={testimonial} alt="" />
+
+          <div className="arrow arrow-left" onClick={prevTestimonial} > <img src={arrowleft} alt="Previous" /> </div>
+          <div className="arrow arrow-right" onClick={nextTestimonial} > <img src={arrowright} alt="Next" /> </div>
         </div>
       </section>
 
       {/* ---------- CTA Banner ---------- */}
       <section className="home-section">
         <div className="home-cta-banner">
-          <h2>Ready to Discover a Better You?</h2>
-          <p>Join thousands of users who have transformed their understanding of facial symmetry</p>
+          <div>
+            <h2>Ready to Discover a Better You?</h2>
+            <p>Join thousands of users who have transformed their understanding of facial symmetry</p>
+          </div>
           <Link to="/signup" className="home-cta-banner-btn">
             Get Started Now
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
@@ -321,9 +323,10 @@ export default function Home() {
           <div className="home-footer-col">
             <Link to="/" className="home-brand">
               <div className="home-brand-logo">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                {/* <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a9 9 0 0 1 0 18M12 3a9 9 0 0 0 0 18" />
-                </svg>
+                </svg> */}
+                <img src={logoImg} alt="Logo" />
               </div>
               <span>CranioAI</span>
             </Link>
@@ -359,9 +362,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="home-footer-bottom">
+        {/* <div className="home-footer-bottom">
           <p>© 2024 CranioAI. All rights reserved.</p>
-        </div>
+        </div> */}
       </footer>
     </div>
   )
