@@ -1,4 +1,4 @@
-import { useRef,useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber"
 import { useGLTF, OrbitControls, Environment } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
@@ -43,7 +43,7 @@ export default function FaceModel() {
       shadows
       camera={{ position: [0, 0, 100], fov: 45 }}
       style={{ width: "100%", height: "100%" }}>
-        
+
       <ambientLight intensity={0.4} />
 
       <hemisphereLight
@@ -73,9 +73,12 @@ export default function FaceModel() {
         enableZoom={true}
         enablePan={false}
         autoRotate={false}
-      // autoRotateSpeed={1}
+        // autoRotateSpeed={1}
         minDistance={100}
         maxDistance={200}
+        minPolarAngle={0}
+        // maxPolarAngle={Math.PI / 2}
+        maxPolarAngle={2.1}
       />
     </Canvas>
   );

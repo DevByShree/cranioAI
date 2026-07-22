@@ -129,13 +129,6 @@ export default function Home() {
           </div>
 
           <div className="home-hero-right">
-            {/* <div className="home-hero-img-wrap"> */}
-            {/* </div> */}
-            {/* <div className="home-scan-line" />
-              <div className="home-scan-dot top-left" />
-              <div className="home-scan-dot top-right" />
-              <div className="home-scan-dot bottom-left" />
-              <div className="home-scan-dot bottom-right" /> */}
             <img src={faceImg} alt="Face analysis" className="home-hero-img" />
 
 
