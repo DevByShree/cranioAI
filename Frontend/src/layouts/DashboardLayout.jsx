@@ -36,6 +36,8 @@ export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const title = pageTitles[location.pathname] || 'Dashboard'
+  
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return (
     <div className="dash-layout">
@@ -79,7 +81,7 @@ export default function DashboardLayout() {
           <div className="dash-user-profile">
             <div className="dash-avatar">SJ</div>
             <div className="dash-user-info">
-              <div className="dash-user-name">Shree Joshi</div>
+              <div className="dash-user-name">{user.username}</div>
               <div className="dash-user-badge">Premium</div>
               <div className="dash-user-since">Member since May 2024</div>
             </div>
@@ -101,8 +103,8 @@ export default function DashboardLayout() {
               <span className="dash-notif-dot"></span>
             </button>
             <div className="dash-topbar-user">
-              <div className="dash-avatar sm">SJ</div>
-              <span className="dash-topbar-name">Shree Joshi</span>
+              <div className="dash-avatar sm">{user.username.slice(0,1)}</div>
+              <span className="dash-topbar-name">{user.username}</span>
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg>
             </div>
           </div>
