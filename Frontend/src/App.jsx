@@ -10,15 +10,27 @@ import Recommendations from './pages/Recommendations/Recommendations'
 import History from './pages/History/History'
 import Settings from './pages/Settings/Settings'
 import DashboardLayout from './layouts/DashboardLayout'
+import ProtectedRoute from "./components/ProtectedRoutes";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
+
+        {/* Protected Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="analyzer" element={<FaceAnalyzer />} />
           <Route path="visualization" element={<Visualization />} />
@@ -27,8 +39,10 @@ export default function App() {
           <Route path="history" element={<History />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
         <Route path="*" element={<Navigate to="/" />} />
+
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
