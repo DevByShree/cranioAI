@@ -120,11 +120,6 @@ export default function FaceAnalyzer() {
       );
 
       localStorage.setItem(
-        "heatmap_url",
-        response.data.symmetry_analysis.heatmap_image
-      );
-
-      localStorage.setItem(
         "overlay_url",
         response.data.symmetry_analysis.overlay_image
       );
@@ -288,13 +283,6 @@ export default function FaceAnalyzer() {
                   )))}
                   <circle cx="150" cy="150" r="4" fill="var(--primary)" />
                 </svg>
-              </div>
-            </div>
-            <div className="analyzer-card analyzer-original">
-              <h3>Heatmap Image</h3>
-              <div className="analyzer-img-wrap">
-                <img src={heatmapUrl} alt="Heatmap" />
-                <div className="analyzer-scan-overlay" />
               </div>
             </div>
             <div className="analyzer-card analyzer-original">

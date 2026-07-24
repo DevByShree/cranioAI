@@ -56,14 +56,11 @@ class AnalyzeAndGenerateAPIView(APIView):
             "success": True,
             "symmetry_analysis": {
                 **symmetry_result,
-                "heatmap_image": f"{base_url}/{symmetry_result['heatmap_image']}",
                 "overlay_image": f"{base_url}/{symmetry_result['overlay_image']}"
             },
             "generated_model": {
                 "glb_url": f"{base_url}/{model_result['model_path']}"
             }
         }
-
-        # print(response_data)
 
         return Response(response_data)
