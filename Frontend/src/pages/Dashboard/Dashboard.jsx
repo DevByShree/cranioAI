@@ -86,11 +86,15 @@ export default function Dashboard() {
     const formData = new FormData();
     formData.append("image", file);
     try {
+
+      const access_token = localStorage.getItem("access");
+
       const response = await axios.post(
         "http://127.0.0.1:8000/api/analyze-generate/",
         formData,
         {
           headers: {
+            "Authorization": `Bearer ${access_token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -99,7 +103,8 @@ export default function Dashboard() {
       setAnalysis(response.data);
 
       localStorage.setItem("glb_url", response.data.generated_model.glb_url)
-
+      
+      await refreshDashboard();
     } catch (error) {
       console.error(error);
     }
@@ -149,6 +154,27 @@ export default function Dashboard() {
 
   const openFilePicker = () => {
     fileInputRef.current.click();
+  };
+
+  const refreshDashboard = async () => {
+    try {
+      const access_token = localStorage.getItem("access");
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/dashboard/",
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
+        }
+      );
+
+      localStorage.setItem(
+        "dashboardData",
+        JSON.stringify(response.data)
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const score = analysis?.symmetry_analysis?.overall_score || 0;
@@ -286,7 +312,7 @@ export default function Dashboard() {
 
       {/* Bottom Row */}
       <div className="dash-bottom-row">
-        <div className="dash-card dash-ba-card">
+        {/* <div className="dash-card dash-ba-card">
           <div className="dash-card-head">
             <h3>3D Face Before/After</h3>
             <div className="dash-ba-toggle">
@@ -312,7 +338,7 @@ export default function Dashboard() {
               <p className="dash-ba-note">Keep up the routine to maintain progress!</p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="dash-card dash-rec-card">
           <div className="dash-card-head">

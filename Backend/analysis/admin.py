@@ -9,6 +9,11 @@ class AnalysisHistoryAdmin(admin.ModelAdmin):
         "id",
         "user",
         "overall_score",
+        "eyes_score",
+        "eyebrows_score",
+        "nose_score",
+        "mouth_score",
+        "jaw_score",
         "created_at",
     )
 

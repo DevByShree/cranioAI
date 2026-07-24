@@ -99,6 +99,9 @@ export default function FaceAnalyzer() {
     formData.append("image", image);
 
     try {
+
+      const access_token = localStorage.getItem("access");
+      
       setStatus("analyzing");
       setProgress(50);
 
@@ -107,6 +110,7 @@ export default function FaceAnalyzer() {
         formData,
         {
           headers: {
+            "Authorization": `Bearer ${access_token}`,
             "Content-Type": "multipart/form-data",
           },
         }

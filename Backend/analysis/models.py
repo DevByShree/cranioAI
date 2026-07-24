@@ -28,10 +28,6 @@ class AnalysisHistory(models.Model):
 
     alignment_angle = models.FloatField()
 
-    heatmap_image = models.ImageField(
-        upload_to="generated_images/"
-    )
-
     overlay_image = models.ImageField(
         upload_to="generated_images/"
     )
