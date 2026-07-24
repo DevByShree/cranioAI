@@ -51,57 +51,103 @@ export default function Signup() {
 
 
   return (
+    // LEFT
     <div className="signup-page">
+
       <div className="signup-left">
+        <div className="signup-brand">
+          Cranio<span>AI</span>
+        </div>
         <img
           src={loginBg}
-          alt="Signup Background"
+          alt="AI Face"
           className="signup-bg-image"
         />
-
-        <div className="hero-logo">
-          <h2>Cranio<span>AI</span></h2>
-        </div>
-
-        <div className="hero-content">
-
-          <div className="ai-badge">
+        <div className="signup-overlay"></div>
+        <div className="signup-content">
+          <div className="signup-ai-badge">
             AI-POWERED
           </div>
-
-          <h1 className="hero-title">
-            Precision.<br />
-            <span>Symmetry.</span><br />
+          <h1 className="signup-hero-title">
+            Precision.
+            <br />
+            <span>Symmetry.</span>
+            <br />
             Perfection.
           </h1>
-
-          <div className="hero-line"></div>
-
-          <p className="hero-description">
+          <p className="signup-hero-description">
             Advanced 3D facial analysis technology
             <br />
             for accurate insights and better outcomes.
           </p>
+          <div className="signup-trusted">
 
-        </div>
+            <span className="signup-trusted-icon">🛡️</span>
 
+            <span>
+              Trusted by professionals. Built for accuracy.
+            </span>
+          </div>
+          <div className="signup-features">
 
-        <div className="feature-box">
-          <div className="feature">
-            <h4>Secure & Private</h4>
+            <div className="signup-feature-card">
+
+              <div className="signup-feature-icon">
+                🛡️
+              </div>
+
+              <h3>Secure & Private</h3>
+
+              <p>
+                Your data is encrypted and protected
+              </p>
+
+            </div>
+
+            <div className="signup-feature-card">
+
+              <div className="signup-feature-icon">
+                🧠
+              </div>
+
+              <h3>AI-Powered</h3>
+
+              <p>
+                Advanced AI for precise symmetry analysis
+              </p>
+
+            </div>
+
+            <div className="signup-feature-card">
+
+              <div className="signup-feature-icon">
+                📦
+              </div>
+
+              <h3>3D Visualization</h3>
+
+              <p>
+                Detailed 3D insights and visual feedback
+              </p>
+
+            </div>
+
           </div>
         </div>
 
-        <div className="trusted">
-          🛡 Trusted by professionals. Built for accuracy.
-        </div>
 
+
+
+        {/* Hero Content */}
       </div>
 
 
 
+      {/*  RIGHT */}
       <div className="signup-right">
+
         <div className="signup-form-wrap">
+
           <h1 className="signup-title">Create Account</h1>
           <p className="signup-subtitle">Get started with CranioAI in seconds</p>
 
@@ -180,5 +226,11 @@ export default function Signup() {
         </div>
       </div>
     </div>
+
+
+
+
+
+
   )
 }
