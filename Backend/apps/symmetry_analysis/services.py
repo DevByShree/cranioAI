@@ -60,16 +60,13 @@ class SymmetryAnalysisService:
 
         file_id = str(uuid.uuid4())
 
-        heatmap_path = f"media/generated_images/{file_id}_heatmap.png"
         overlay_path = f"media/generated_images/{file_id}_overlay.png"
 
-        cv2.imwrite(heatmap_path, heatmap_img)
         cv2.imwrite(overlay_path, overlay_img)
 
         return {
             "overall_score": overall_score,
             "region_scores": report,
             "alignment_angle": angle,
-            "heatmap_image": heatmap_path,
             "overlay_image": overlay_path
         }

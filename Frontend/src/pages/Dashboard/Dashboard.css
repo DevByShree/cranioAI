@@ -44,7 +44,7 @@
 /* ---------- Top Stats ---------- */
 .dash-stats-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
@@ -245,11 +245,11 @@
 }
 
 /* ---------- Bottom Row ---------- */
-.dash-bottom-row {
+/* .dash-bottom-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-}
+} */
 
 .dash-ba-toggle {
   display: flex;
@@ -434,6 +434,10 @@
 .dash-recent-status.average {
   color: var(--warning);
   background: rgba(255, 179, 0, 0.1);
+}
+.dash-recent-status.starting {
+  color: var(--text-muted);
+  background: var(--bg-main);
 }
 
 /* ---------- Responsive ---------- */

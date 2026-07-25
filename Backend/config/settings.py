@@ -41,10 +41,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'accounts',
     'corsheaders',
+    
     "apps.symmetry_analysis.apps.SymmetryAnalysisConfig",
-    "apps.model_generation.apps.ModelGenerationConfig",]
+    "apps.model_generation.apps.ModelGenerationConfig",
+    'accounts',
+    "analysis",
+    ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

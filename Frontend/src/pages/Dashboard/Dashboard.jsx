@@ -2,39 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import './Dashboard.css'
 import axios from "axios";
-import FaceModel from '../../components/FaceModel';
-
-const topStats = [
-  { label: 'Overall Symmetry', value: '87%', icon: 'symmetry', trend: '+3% this month' },
-  { label: 'Analysis This Month', value: '4', icon: 'scan', trend: '2 pending' },
-  { label: 'Best Score', value: '91%', icon: 'trophy', trend: 'Jun 15, 2024' },
-  { label: 'Face Age', value: '23', icon: 'clock', trend: 'Estimated' },
-]
-
-const metrics = [
-  { label: 'Left/Right Balance', value: 85 },
-  { label: 'Eye Symmetry', value: 90 },
-  { label: 'Nose Symmetry', value: 88 },
-  { label: 'Mouth Symmetry', value: 82 },
-  { label: 'Chin & Jawline', value: 85 },
-]
-
-const chartData = [
-  { day: 'Jun 1', score: 78 }, { day: 'Jun 5', score: 80 }, { day: 'Jun 10', score: 82 },
-  { day: 'Jun 15', score: 85 }, { day: 'Jun 20', score: 84 }, { day: 'Jun 25', score: 86 },
-  { day: 'Jun 30', score: 87 },
-]
 
 const recommendations = [
   { title: 'Jaw Alignment Exercise', freq: '3 sets × 10 reps', icon: 'jaw' },
   { title: 'Eye Symmetry Drill', freq: '2 sets × 15 reps', icon: 'eye' },
   { title: 'Facial Massage Routine', freq: '5 min daily', icon: 'massage' },
-]
-
-const recentAnalyses = [
-  { date: 'Jun 30, 2024', score: 87, status: 'Good' },
-  { date: 'Jun 25, 2024', score: 86, status: 'Good' },
-  { date: 'Jun 20, 2024', score: 84, status: 'Average' },
 ]
 
 const iconPaths = {
@@ -48,107 +20,43 @@ const iconPaths = {
 }
 
 export default function Dashboard() {
-  const [view, setView] = useState('before')
 
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [analysis, setAnalysis] = useState(null);
+  const [analysis, setAnalysis] = useState(() => {
+    const saved = localStorage.getItem("analysis");
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  const fileInputRef = useRef(null)
+  const [preview, setPreview] = useState(
+    () => localStorage.getItem("preview") || null
+  );
 
   useEffect(() => {
-    const savedAnalysis = localStorage.getItem("analysis");
-    const savedPreview = localStorage.getItem("preview");
-
-    if (savedAnalysis) {
-      setAnalysis(JSON.parse(savedAnalysis));
-    }
-
-    if (savedPreview) {
-      setPreview(savedPreview);
-    }
+    refreshDashboard();
   }, []);
 
-  useEffect(() => {
-    if (analysis) {
-      localStorage.setItem("analysis", JSON.stringify(analysis));
-    }
-  }, [analysis]);
+  const [dashboardData, setDashboardData] = useState(null);
 
-
-  useEffect(() => {
-    if (preview) {
-      localStorage.setItem("preview", preview);
-    }
-  }, [preview]);
-
-  const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append("image", file);
+  const refreshDashboard = async () => {
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/analyze-generate/",
-        formData,
+      const access_token = localStorage.getItem("access");
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/dashboard/",
         {
           headers: {
-            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${access_token}`,
           },
         }
       );
 
-      setAnalysis(response.data);
+      setDashboardData(response.data);
 
-      localStorage.setItem("glb_url", response.data.generated_model.glb_url)
-
+      localStorage.setItem(
+        "dashboardData",
+        JSON.stringify(response.data)
+      );
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setImage(file);
-
-    const base64 = await fileToBase64(file);
-
-    setPreview(base64);
-
-    uploadImage(file);
-  };
-
-  const handleDrop = async (e) => {
-    e.preventDefault();
-
-    const file = e.dataTransfer.files[0];
-
-    if (!file) return;
-
-    setImage(file);
-
-    const base64 = await fileToBase64(file);
-
-    setPreview(base64);
-
-    uploadImage(file);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const openFilePicker = () => {
-    fileInputRef.current.click();
   };
 
   const score = analysis?.symmetry_analysis?.overall_score || 0;
@@ -163,9 +71,30 @@ export default function Dashboard() {
     )
     : [];
 
-  const modelUrl =
-    analysis?.generated_model?.glb_url ||
-    localStorage.getItem("glb_url");
+  const stats = dashboardData?.stats;
+
+  const averageSymmetry = stats?.average_score?.toFixed(1) || "0.0";
+  const bestScore = stats?.best_score?.toFixed(1) || "0.0";
+  const totalUploads = stats?.total_uploads || 0;
+
+  // Current month uploads
+  const currentMonthUploads =
+    dashboardData?.graph?.filter(item => {
+      const d = new Date(item.date);
+      const now = new Date();
+
+      return (
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear()
+      );
+    }).length || 0;
+
+  const topStats = [
+    { label: "Average Symmetry", value: `${averageSymmetry}%`, icon: "symmetry", trend: `${totalUploads} Total Analyses`, },
+    { label: "This Month", value: currentMonthUploads, icon: "scan", trend: "Current Month", },
+    { label: "Best Score", value: `${bestScore}%`, icon: "trophy", trend: "All Time", },
+    // { label: "Face Age", value: "23", icon: "clock", trend: "Estimated", },
+  ];
 
   return (
     <div className="dash-page">
@@ -191,53 +120,19 @@ export default function Dashboard() {
       <div className="dash-mid-row">
         <div className="dash-card dash-upload-card">
           <div className="dash-card-head">
-            <h3>Upload & Analyze</h3>
-            <span className="dash-card-badge">New</span>
+            <h3>Recent Analysis</h3>
           </div>
-          <div className="dash-upload-body">
-            <div className="dash-dropzone"
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onClick={openFilePicker}>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
-              <div className="dash-dropzone-icon">
-                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" /></svg>
-              </div>
-              <p>Drag & drop your photo here</p>
-              <span>or click to browse</span>
-              <button className="dash-upload-btn">Choose File</button>
-            </div>
-            <div className="dash-preview">
-              <div className="dash-preview-img">
-                {preview ? (
-                  <img src={preview} alt="Preview" className="preview-image" />
-                ) : (
-                  <svg viewBox="0 0 100 120" width="100%" height="100%">
-                    <ellipse cx="50" cy="60" rx="35" ry="50" fill="none" stroke="var(--border)" strokeWidth="1.5" />
-                    <circle cx="38" cy="48" r="3" fill="var(--text-muted)" />
-                    <circle cx="62" cy="48" r="3" fill="var(--text-muted)" />
-                    <path d="M 42 75 Q 50 80 58 75" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" />
-                  </svg>
-                )}
-              </div>
-              <div className="dash-preview-info">
-                <div className="dash-preview-name">
-                  {image ? image.name : "No file selected"}
-                </div>
-                <div className="dash-preview-size">
-                  {image ? (image.size / (1024 * 1024)).toFixed(2) + "MB" : "--"}
-                </div>
-                <div className="dash-preview-status">
-                  {image ? "Ready to analyze" : "Waiting for image"}
-                </div>
-              </div>
-            </div>
+          <div className="dash-preview-img">
+            {preview ? (
+              <img src={preview} alt="Preview" className="preview-image" />
+            ) : (
+              <svg viewBox="0 0 100 120" width="100%" height="100%">
+                <ellipse cx="50" cy="60" rx="35" ry="50" fill="none" stroke="var(--border)" strokeWidth="1.5" />
+                <circle cx="38" cy="48" r="3" fill="var(--text-muted)" />
+                <circle cx="62" cy="48" r="3" fill="var(--text-muted)" />
+                <path d="M 42 75 Q 50 80 58 75" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" />
+              </svg>
+            )}
           </div>
         </div>
 
@@ -286,34 +181,6 @@ export default function Dashboard() {
 
       {/* Bottom Row */}
       <div className="dash-bottom-row">
-        <div className="dash-card dash-ba-card">
-          <div className="dash-card-head">
-            <h3>3D Face Before/After</h3>
-            <div className="dash-ba-toggle">
-              <button className={view === 'before' ? 'active' : ''} onClick={() => setView('before')}>Before</button>
-              <button className={view === 'after' ? 'active' : ''} onClick={() => setView('after')}>After</button>
-            </div>
-          </div>
-          <div className="dash-ba-body">
-            <div className="dash-ba-face">
-              {
-                modelUrl ?
-                  <FaceModel modelUrl={modelUrl} config={{
-                    scale: 35,
-                    cameraPosition: [0, 0, 50],
-                    minDistance: 30,
-                    maxDistance: 100,
-                    position: [0, 0, 0],
-                  }} /> : <p>No 3D Model Yet</p>}
-            </div>
-            <div className="dash-ba-info">
-              <p>Improvement over 30 days of exercises:</p>
-              <div className="dash-ba-improve">+17%</div>
-              <p className="dash-ba-note">Keep up the routine to maintain progress!</p>
-            </div>
-          </div>
-        </div>
-
         <div className="dash-card dash-rec-card">
           <div className="dash-card-head">
             <h3>AI Recommendations</h3>
@@ -346,10 +213,10 @@ export default function Dashboard() {
         </div>
         <div className="dash-chart">
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={chartData}>
+            <LineChart data={dashboardData?.graph || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
-              <XAxis dataKey="day" stroke="var(--text-muted)" fontSize={12} />
-              <YAxis stroke="var(--text-muted)" fontSize={12} domain={[70, 100]} />
+              <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={12} />
+              <YAxis stroke="var(--text-muted)" fontSize={12} domain={[0, 100]} />
               <Tooltip
                 contentStyle={{ borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}
               />
@@ -363,18 +230,17 @@ export default function Dashboard() {
       <div className="dash-card dash-recent-card">
         <div className="dash-card-head"><h3>Recent Analysis</h3></div>
         <div className="dash-recent-list">
-          {recentAnalyses.map((a, i) => (
-            <div className="dash-recent-item" key={i}>
+          {dashboardData?.recent_uploads?.map((a) => (
+            <div className="dash-recent-item" key={a.id}>
               <div className="dash-recent-thumb">
-                <svg viewBox="0 0 40 48" width="40" height="48">
-                  <ellipse cx="20" cy="24" rx="15" ry="20" fill="none" stroke="var(--border)" strokeWidth="1.5" />
-                  <circle cx="15" cy="20" r="1.5" fill="var(--text-muted)" />
-                  <circle cx="25" cy="20" r="1.5" fill="var(--text-muted)" />
-                </svg>
+                <img
+                  src={`http://127.0.0.1:8000${a.uploaded_image || ''}`}
+                  alt="upload"
+                />
               </div>
               <div className="dash-recent-date">{a.date}</div>
-              <div className="dash-recent-score">{a.score}%</div>
-              <span className={`dash-recent-status ${a.status.toLowerCase()}`}>{a.status}</span>
+              <div className="dash-recent-score">{a.overall_score}%</div>
+              <span className={`dash-recent-status ${a.overall_score >= 85 ? "good" : a.overall_score >= 70 ? "average" : "starting"}`}>{a.overall_score >= 85 ? "Excellent" : a.overall_score >= 70 ? "Good" : "Needs Work"}</span>
             </div>
           ))}
         </div>
