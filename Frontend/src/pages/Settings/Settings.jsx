@@ -1,21 +1,138 @@
-import './Settings.css'
+import "./Settings.css";
+import { useNavigate } from "react-router-dom";
+
+import {
+  FiUser,
+  FiShield,
+  FiSliders,
+  FiCreditCard,
+  FiHelpCircle,
+  FiInfo,
+  FiChevronRight,
+} from "react-icons/fi";
 
 export default function Settings() {
+  const navigate = useNavigate();
   return (
-    <div className="settings-page">
-      <div className="settings-header">
+    <div className="setting-page">
+
+      <div className="setting-header">
         <h2>Settings</h2>
         <p>Manage your account and preferences</p>
       </div>
-      <div className="settings-placeholder">
-        <div className="settings-placeholder-icon">
-          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
-          </svg>
+
+      <div className="setting-grid">
+
+        {/* Profile Card */}
+        <div className="setting-card"
+          onClick={() => navigate("/dashboard/settings/profile")}>
+          <div className="card-left">
+          <div className="card-icon">
+            <FiUser />
+          </div>
+
+          <div className="card-content">
+            <h3>Profile</h3>
+            <p>Manage your personal information.</p>
+          </div>
         </div>
-        <h3>Settings Coming Soon</h3>
-        <p>Account preferences, privacy controls, and notification settings will be available here.</p>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
       </div>
+
+      {/* Privacy Card */}
+      <div className="setting-card">
+        <div className="card-left">
+          <div className="card-icon">
+            <FiShield />
+          </div>
+
+          <div className="card-content">
+            <h3>Privacy & Security</h3>
+            <p>Control your privacy settings and account security.</p>
+          </div>
+        </div>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
+      </div>
+
+      {/* Preferences Card */}
+      <div className="setting-card">
+        <div className="card-left">
+          <div className="card-icon">
+            <FiSliders />
+          </div>
+
+          <div className="card-content">
+            <h3>Preferences</h3>
+            <p>Customize your app experience, language, theme, and default settings.</p>
+          </div>
+        </div>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
+      </div>
+
+      {/* Help Card */}
+      <div className="setting-card">
+        <div className="card-left">
+          <div className="card-icon">
+            <FiHelpCircle />
+          </div>
+
+          <div className="card-content">
+            <h3>Help & Support</h3>
+            <p>Get help, contact support, and browse FAQs.</p>
+          </div>
+        </div>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
+      </div>
+
+      {/* Subscription Card */}
+      <div className="setting-card">
+        <div className="card-left">
+          <div className="card-icon">
+            <FiCreditCard />
+          </div>
+
+          <div className="card-content">
+            <h3>Subscription & Billing</h3>
+            <p>Manage your subscription, payments, and billing history.</p>
+          </div>
+        </div>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
+      </div>
+
+      {/* About Card */}
+      <div className="setting-card">
+        <div className="card-left">
+          <div className="card-icon">
+            <FiInfo />
+          </div>
+
+          <div className="card-content">
+            <h3>About CranioAI</h3>
+            <p>Learn more about our mission, technology, and platform.</p>
+          </div>
+        </div>
+
+        <div className="card-arrow">
+          <FiChevronRight />
+        </div>
+      </div>
+
     </div>
-  )
+    </div >
+  );
 }

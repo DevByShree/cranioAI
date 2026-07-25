@@ -9,6 +9,7 @@ const navItems = [
   { to: '/dashboard/visualization', label: '3D Visualization', icon: 'cube' },
   { to: '/dashboard/progress', label: 'Progress', icon: 'trending' },
   { to: '/dashboard/recommendations', label: 'Recommendations', icon: 'bulb' },
+  { to: '/dashboard/Excersise', label: 'Excersise', icon:'clock'},
   { to: '/dashboard/history', label: 'History', icon: 'clock' },
   { to: '/dashboard/settings', label: 'Settings', icon: 'settings' },
 ]
@@ -29,6 +30,7 @@ const pageTitles = {
   '/dashboard/visualization': '3D Visualization',
   '/dashboard/progress': 'Progress Tracking',
   '/dashboard/recommendations': 'AI Recommendations',
+  '/dashboard/Excersise' : 'Excersise',
   '/dashboard/history': 'Analysis History',
   '/dashboard/settings': 'Settings',
 }
@@ -93,7 +95,7 @@ export default function DashboardLayout() {
           </div>
 
           <div className="dash-user-profile">
-            <div className="dash-avatar">SJ</div>
+            <div className="dash-avatar">{user.username.slice(0,1)}</div>
             <div className="dash-user-info">
               <div className="dash-user-name">{user.username}</div>
               <div className="dash-user-badge">Premium</div>
