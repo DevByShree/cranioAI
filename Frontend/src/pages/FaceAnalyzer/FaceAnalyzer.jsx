@@ -119,42 +119,97 @@ export default function FaceAnalyzer() {
       setStatus("analyzing");
       setProgress(50);
 
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/analyze-generate/",
-        formData,
-        {
-          headers: {
-            "Authorization": `Bearer ${access_token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await fetch('http://localhost:8000/api/analyze-generate/', {
+        method: 'POST',
+        body: formData,
+        signal: controller.signal,
+      })
 
-      setAnalysis(response.data);
+      clearTimeout(timeout)
+
+      if (!res.ok) throw new Error('Bad response')
+
+      const data = await res.json();
+      console.log(data);
+
+      const formattedResults = {
+
+        symmetryScore:
+          data.symmetry_analysis.overall_score,
+
+        landmarks: 468,
+
+        metrics: [
+
+          {
+            label: "Eyes",
+            value: data.symmetry_analysis.region_scores.eyes,
+          },
+
+          {
+            label: "Eyebrows",
+            value: data.symmetry_analysis.region_scores.eyebrows,
+          },
+
+          {
+            label: "Nose",
+            value: data.symmetry_analysis.region_scores.nose,
+          },
+
+          {
+            label: "Mouth",
+            value: data.symmetry_analysis.region_scores.mouth,
+          },
+
+          {
+            label: "Jaw",
+            value: data.symmetry_analysis.region_scores.jaw,
+          },
+
+        ],
+
+        recommendations:
+          data.recommendations,
+
+        heatmap:
+          data.symmetry_analysis.heatmap_image,
+
+        overlay:
+          data.symmetry_analysis.overlay_image,
+
+        model:
+          data.generated_model.glb_url,
+
+      }
+      localStorage.setItem(
+        "recommendations",
+        JSON.stringify(formattedResults.recommendations)
+      );
 
       localStorage.setItem(
         "analysis",
-        JSON.stringify(response.data)
+        JSON.stringify(formattedResults)
       );
 
-      localStorage.setItem(
-        "overlay_url",
-        response.data.symmetry_analysis.overlay_image
-      );
+      console.log("Saved analysis");
 
-      if (response.data.generated_model?.glb_url) {
-        localStorage.setItem(
-          "glb_url",
-          response.data.generated_model.glb_url
-        );
-      }
-
-      setStatus("results");
-      setProgress(100);
-
-    } catch (error) {
-      console.error(error);
-      setStatus("error");
+      setResults(formattedResults)
+      //     navigate("/recommendations", {
+      //       state: {
+      //         recommendations: formattedResults.recommendations,
+      //        symmetry: formattedResults,
+      //      },
+      //    });
+      setStatus('results')
+      setProgress(100)
+    } catch (err) {
+      console.warn('Backend unavailable, using mock data:', err.message)
+      setProgress(100)
+      setStatus('error')
+      setTimeout(() => {
+        setResults(mockResults)
+        setStatus('results')
+      }, 800)
     }
   };
 
@@ -335,7 +390,7 @@ export default function FaceAnalyzer() {
                   <div className="analyzer-metric-item" key={m.label}>
                     <div className="analyzer-metric-head">
                       <span>{m.label}</span>
-                      <span className="analyzer-metric-val">{m.value}%</span>
+                      <span className="analyzer-metric-val">{Number(m.value).toFixed(2)}%</span>
                     </div>
                     <div className="analyzer-metric-bar">
                       <div className="analyzer-metric-fill" style={{ width: `${m.value}%` }} />
@@ -355,9 +410,40 @@ export default function FaceAnalyzer() {
                         <path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                       </svg>
                     </div>
-                    <div>
-                      <div className="analyzer-rec-title">{r.title}</div>
-                      <div className="analyzer-rec-detail">{r.detail}</div>
+                    <div className="analyzer-rec-title">
+
+                      {r.title}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      {r.reason}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Priority:</strong>
+
+                      {r.priority_label}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Difficulty:</strong>
+
+                      {r.difficulty}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Duration:</strong>
+
+                      {r.duration}
+
                     </div>
                   </div>
                 ))}

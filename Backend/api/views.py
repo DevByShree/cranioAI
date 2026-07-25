@@ -2,8 +2,11 @@ import os
 import traceback
 import uuid
 
+# pyrefly: ignore [missing-import]
 from rest_framework.views import APIView
+# pyrefly: ignore [missing-import]
 from rest_framework.response import Response
+# pyrefly: ignore [missing-import]
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -11,6 +14,7 @@ from .serializers import ImageUploadSerializer
 
 from apps.symmetry_analysis.services import (SymmetryAnalysisService)
 from apps.model_generation.services import (FaceModelGenerator)
+from apps.recommendations.services import (RecommendationService)
 
 from analysis.models import AnalysisHistory
 
@@ -47,10 +51,12 @@ class AnalyzeAndGenerateAPIView(APIView):
         service = SymmetryAnalysisService()
 
         generator_service = FaceModelGenerator()
+        recommendation_service = RecommendationService()
         
         try:
             
             symmetry_result = service.analyze(image_path)
+            recommendations = recommendation_service.generate(symmetry_result)
             model_result = generator_service.generate(image_path)
             
             AnalysisHistory.objects.create(
@@ -84,14 +90,20 @@ class AnalyzeAndGenerateAPIView(APIView):
         base_url = request.build_absolute_uri("/")[:-1]
 
         response_data = {
+
             "success": True,
+
             "symmetry_analysis": {
                 **symmetry_result,
                 "overlay_image": f"{base_url}/{symmetry_result['overlay_image']}"
             },
+
             "generated_model": {
                 "glb_url": f"{base_url}/{model_result['model_path']}"
-            }
-        }
+            },
+
+            "recommendations": recommendations
+        }   
+        print(response_data)
 
         return Response(response_data)
