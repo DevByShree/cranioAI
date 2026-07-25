@@ -114,7 +114,7 @@ export default function FaceAnalyzer() {
 
     try {
 
-      const access_token = localStorage.getItem("access");
+      const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
 
       setStatus("analyzing");
       setProgress(50);
