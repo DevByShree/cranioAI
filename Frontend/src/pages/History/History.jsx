@@ -38,56 +38,63 @@ export default function History() {
   }, []);
 
   const summaryStats = [
-
+    { label: "Total Analyses", value: history.length, icon: "scan" },
+    { label: "Average Score", value: history.length > 0 ? (history.reduce((sum, item) => sum + item.overall_score, 0) / history.length).toFixed(1) + "%" : "0%", icon: "symmetry" },
+    { label: "Best Score", value: history.length > 0 ? Math.max(...history.map(h => h.overall_score)).toFixed(1) + "%" : "0%", icon: "trophy" },
     {
-      label: "Total Analyses",
-      value: history.length,
-      icon: "scan"
-    },
-
-    {
-      label: "Average Score",
-      value:
-        history.length > 0
-          ? (
-            history.reduce(
-              (sum, item) => sum + item.overall_score,
-              0
-            ) / history.length
-          ).toFixed(1) + "%"
-          : "0%",
-      icon: "symmetry"
-    },
-
-    {
-      label: "Best Score",
-      value:
-        history.length > 0
-          ? Math.max(
-            ...history.map(h => h.overall_score)
-          ).toFixed(1) + "%"
-          : "0%",
-      icon: "trophy"
-    },
-
-    {
-      label: "This Month",
-      value: history.filter(item => {
-
+      label: "This Month", value: history.filter(item => {
         const d = new Date(item.created_at);
         const now = new Date();
-
-        return (
-          d.getMonth() === now.getMonth() &&
-          d.getFullYear() === now.getFullYear()
-        );
-
-      }).length,
-      icon: "clock"
+        return (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear());
+      }).length, icon: "clock"
     }
-
   ];
 
+  const exportCSV = () => {
+    if (!history.length) return;
+
+    const rows = history.map((item,index) => ({
+      ID: index + 1,
+      Date: new Date(item.created_at).toLocaleDateString(),
+      Time: new Date(item.created_at).toLocaleTimeString(),
+      Score: item.overall_score.toFixed(2),
+      Status:
+        item.overall_score >= 85
+          ? "Excellent"
+          : item.overall_score >= 70
+            ? "Good"
+            : "Needs Work",
+    }));
+
+    const headers = Object.keys(rows[0]);
+
+    const csv = [
+      headers.join(","),
+      ...rows.map((row) =>
+        headers
+          .map((header) => `"${String(row[header]).replace(/"/g, '""')}"`)
+          .join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `analysis-history-${new Date()
+      .toISOString()
+      .split("T")[0]}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(url);
+  };
 
   if (loading) {
     return <h2>Loading...</h2>;
@@ -100,7 +107,7 @@ export default function History() {
           <h2>Analysis History</h2>
           <p>View all your past facial symmetry analyses</p>
         </div>
-        <button className="history-export">
+        <button className="history-export" onClick={exportCSV}>
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
           </svg>
@@ -156,7 +163,7 @@ export default function History() {
               </div>
               <span className="history-date">{new Date(item.created_at).toLocaleDateString()}</span>
               <span className="history-time">{new Date(item.created_at).toLocaleTimeString()}</span>
-              <span className="history-score">{item.overall_score.toFixed(2)}%%</span>
+              <span className="history-score">{item.overall_score.toFixed(2)}%</span>
               <span
                 className={`history-status ${item.overall_score >= 85 ? "good" : item.overall_score >= 70 ? "average" : "starting"}`}>
                 {item.overall_score >= 85 ? "Excellent" : item.overall_score >= 70 ? "Good" : "Needs Work"}
