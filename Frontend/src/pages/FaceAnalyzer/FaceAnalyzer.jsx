@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useState, useCallback } from 'react'
 import './FaceAnalyzer.css'
 
@@ -27,6 +28,7 @@ const states = {
 }
 
 export default function FaceAnalyzer() {
+  const navigate = useNavigate();
   const [status, setStatus] = useState('idle')
   const [image, setImage] = useState(null)
   const [results, setResults] = useState(null)
@@ -64,7 +66,7 @@ export default function FaceAnalyzer() {
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 5000)
 
-      const res = await fetch('http://localhost:8000/api/analyze/', {
+      const res = await fetch('http://localhost:8000/api/analyze-generate/', {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -74,8 +76,77 @@ export default function FaceAnalyzer() {
 
       if (!res.ok) throw new Error('Bad response')
 
-      const data = await res.json()
-      setResults(data)
+      const data = await res.json();
+      console.log(data);
+
+      const formattedResults = {
+
+        symmetryScore:
+          data.symmetry_analysis.overall_score,
+
+        landmarks: 468,
+
+        metrics: [
+
+          {
+            label: "Eyes",
+            value: data.symmetry_analysis.region_scores.eyes,
+          },
+
+          {
+            label: "Eyebrows",
+            value: data.symmetry_analysis.region_scores.eyebrows,
+          },
+
+          {
+            label: "Nose",
+            value: data.symmetry_analysis.region_scores.nose,
+          },
+
+          {
+            label: "Mouth",
+            value: data.symmetry_analysis.region_scores.mouth,
+          },
+
+          {
+            label: "Jaw",
+            value: data.symmetry_analysis.region_scores.jaw,
+          },
+
+        ],
+
+        recommendations:
+          data.recommendations,
+
+        heatmap:
+          data.symmetry_analysis.heatmap_image,
+
+        overlay:
+          data.symmetry_analysis.overlay_image,
+
+        model:
+          data.generated_model.glb_url,
+
+      }
+      localStorage.setItem(
+        "recommendations",
+        JSON.stringify(formattedResults.recommendations)
+      );
+
+      localStorage.setItem(
+        "analysis",
+        JSON.stringify(formattedResults)
+      );
+
+      console.log("Saved analysis");
+
+      setResults(formattedResults)
+      //     navigate("/recommendations", {
+      //       state: {
+      //         recommendations: formattedResults.recommendations,
+      //        symmetry: formattedResults,
+      //      },
+      //    });
       setStatus('results')
       setProgress(100)
     } catch (err) {
@@ -139,7 +210,7 @@ export default function FaceAnalyzer() {
               <div className="analyzer-dropzone-content">
                 <div className="analyzer-dropzone-icon">
                   <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
                   </svg>
                 </div>
                 <h3>Drag & drop your photo here</h3>
@@ -168,7 +239,7 @@ export default function FaceAnalyzer() {
                 ) : (
                   <>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/>
+                      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10" />
                     </svg>
                     Analyze Face
                   </>
@@ -202,10 +273,10 @@ export default function FaceAnalyzer() {
               <div className="analyzer-img-wrap">
                 <img src={image} alt="Annotated" className="analyzer-mirror" />
                 <svg className="analyzer-landmarks" viewBox="0 0 300 300" preserveAspectRatio="none">
-                  <line x1="150" y1="20" x2="150" y2="280" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6"/>
-                  <line x1="20" y1="150" x2="280" y2="150" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6"/>
+                  <line x1="150" y1="20" x2="150" y2="280" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
+                  <line x1="20" y1="150" x2="280" y2="150" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
                   {[100, 200].map(x => [100, 200].map(y => (
-                    <circle key={`${x}-${y}`} cx={x} cy={y} r="3" fill="var(--accent)" opacity="0.8"/>
+                    <circle key={`${x}-${y}`} cx={x} cy={y} r="3" fill="var(--accent)" opacity="0.8" />
                   )))}
                   <circle cx="150" cy="150" r="4" fill="var(--primary)" />
                 </svg>
@@ -217,7 +288,7 @@ export default function FaceAnalyzer() {
             <div className="analyzer-card analyzer-score-detail">
               <h3>Symmetry Breakdown</h3>
               <div className="analyzer-big-score">
-                <div className="analyzer-big-num">{results.symmetryScore}%</div>
+                <div className="analyzer-big-num">{Number(results.symmetryScore).toFixed(2)}%</div>
                 <div className="analyzer-big-label">Overall Symmetry</div>
               </div>
               <div className="analyzer-metric-list">
@@ -225,7 +296,7 @@ export default function FaceAnalyzer() {
                   <div className="analyzer-metric-item" key={m.label}>
                     <div className="analyzer-metric-head">
                       <span>{m.label}</span>
-                      <span className="analyzer-metric-val">{m.value}%</span>
+                      <span className="analyzer-metric-val">{Number(m.value).toFixed(2)}%</span>
                     </div>
                     <div className="analyzer-metric-bar">
                       <div className="analyzer-metric-fill" style={{ width: `${m.value}%` }} />
@@ -245,18 +316,49 @@ export default function FaceAnalyzer() {
                   <div className="analyzer-rec-item" key={i}>
                     <div className="analyzer-rec-icon">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                        <path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                       </svg>
                     </div>
-                    <div>
-                      <div className="analyzer-rec-title">{r.title}</div>
-                      <div className="analyzer-rec-detail">{r.detail}</div>
+                    <div className="analyzer-rec-title">
+
+                      {r.title}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      {r.reason}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Priority:</strong>
+
+                      {r.priority_label}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Difficulty:</strong>
+
+                      {r.difficulty}
+
+                    </div>
+
+                    <div className="analyzer-rec-detail">
+
+                      <strong>Duration:</strong>
+
+                      {r.duration}
+
                     </div>
                   </div>
                 ))}
               </div>
               <button className="analyzer-new-analysis" onClick={reset}>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9M3 12l4-4M3 12l4 4"/></svg>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 12a9 9 0 1 0 9-9M3 12l4-4M3 12l4 4" /></svg>
                 New Analysis
               </button>
             </div>
