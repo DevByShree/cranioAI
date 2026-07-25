@@ -1,53 +1,167 @@
-.settings-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.setting-page{
+    padding:30px;
 }
 
-.settings-header h2 {
-  font-size: 24px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+/* ===========================
+   Header
+=========================== */
+
+.setting-header{
+    margin-bottom:30px;
 }
 
-.settings-header p {
-  font-size: 14px;
-  color: var(--text-secondary);
+.setting-header h2{
+    margin:0;
+    font-size:32px;
+    font-weight:700;
+    color:#1F2937;
 }
 
-.settings-placeholder {
-  background: var(--bg-white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-light);
-  padding: 60px 24px;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
+.setting-header p{
+    margin-top:8px;
+    color:#6B7280;
+    font-size:16px;
 }
 
-.settings-placeholder-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
-  border-radius: 20px;
-  background: var(--primary-pale);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* ===========================
+   Grid
+=========================== */
+
+.setting-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:25px;
 }
 
-.settings-placeholder h3 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+/* ===========================
+   Card
+=========================== */
+
+.setting-card{
+    background:#fff;
+    border-radius:20px;
+    padding:25px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+
+    cursor:pointer;
+    transition:all .3s ease;
 }
 
-.settings-placeholder p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  max-width: 360px;
-  margin: 0 auto;
-  line-height: 1.5;
+.setting-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 12px 25px rgba(0,0,0,.12);
+}
+
+/* ===========================
+   Left Side
+=========================== */
+
+.card-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+/* ===========================
+   Icon
+=========================== */
+
+.card-icon{
+    width:60px;
+    height:60px;
+
+    border-radius:50%;
+
+    background:#ECF8F0;
+    color:#15803D;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:28px;
+
+    flex-shrink:0;
+}
+
+/* ===========================
+   Content
+=========================== */
+
+.card-content h3{
+    margin:0;
+    font-size:22px;
+    font-weight:600;
+    color:#1F2937;
+}
+
+.card-content p{
+    margin-top:6px;
+    margin-bottom:0;
+
+    font-size:15px;
+    line-height:1.5;
+
+    color:#6B7280;
+}
+
+/* ===========================
+   Arrow
+=========================== */
+
+.card-arrow{
+    display:flex;
+    align-items:center;
+
+    font-size:22px;
+    color:#374151;
+
+    flex-shrink:0;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:992px){
+
+    .setting-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .setting-page{
+        padding:20px;
+    }
+
+    .setting-card{
+        padding:20px;
+    }
+
+    .card-left{
+        gap:15px;
+    }
+
+    .card-icon{
+        width:52px;
+        height:52px;
+        font-size:24px;
+    }
+
+    .card-content h3{
+        font-size:20px;
+    }
+
+    .card-content p{
+        font-size:14px;
+    }
+
 }
