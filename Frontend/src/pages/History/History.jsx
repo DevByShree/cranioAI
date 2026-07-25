@@ -150,7 +150,7 @@ export default function History() {
             <div className="history-table-row" key={item.id}>
               <div className="history-thumb">
                 <img
-                  src={`http://127.0.0.1:8000${item.uploaded_image}`}
+                  src={`http://127.0.0.1:8000${item.uploaded_image || ''}`}
                   alt="upload"
                 />
               </div>
@@ -162,7 +162,6 @@ export default function History() {
                 {item.overall_score >= 85 ? "Excellent" : item.overall_score >= 70 ? "Good" : "Needs Work"}
               </span>
               <button className="history-view-btn"
-                className="history-view-btn"
                 onClick={() => console.log(item)}>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" />

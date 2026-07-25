@@ -56,7 +56,7 @@ class AnalyzeAndGenerateAPIView(APIView):
             AnalysisHistory.objects.create(
                         user=request.user,
 
-                        uploaded_image=image_path,
+                        uploaded_image=f"uploads/{filename}",
 
                         overall_score=symmetry_result["overall_score"],
 

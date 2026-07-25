@@ -15,6 +15,7 @@ class AnalysisHistoryAdmin(admin.ModelAdmin):
         "mouth_score",
         "jaw_score",
         "created_at",
+        "uploaded_image",
     )
 
     list_filter = (
