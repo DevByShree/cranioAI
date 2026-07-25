@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from "react";
 import './FaceAnalyzer.css'
+import axios from "axios";
 
 const mockResults = {
   symmetryScore: 87,
@@ -28,19 +28,65 @@ const states = {
 }
 
 export default function FaceAnalyzer() {
-  const navigate = useNavigate();
-  const [status, setStatus] = useState('idle')
-  const [image, setImage] = useState(null)
-  const [results, setResults] = useState(null)
-  const [dragOver, setDragOver] = useState(false)
-  const [progress, setProgress] = useState(0)
+  const [status, setStatus] = useState("idle");
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [analysis, setAnalysis] = useState(null);
 
-  const handleFile = useCallback((file) => {
-    if (!file || !file.type.startsWith('image/')) return
-    setImage(URL.createObjectURL(file))
-    setResults(null)
-    setStatus('idle')
-  }, [])
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+  const savedAnalysis = localStorage.getItem("analysis");
+  const savedPreview = localStorage.getItem("preview");
+  const savedOverlay = localStorage.getItem("overlay_url");
+
+  if (savedAnalysis) setAnalysis(JSON.parse(savedAnalysis));
+  if (savedPreview) setPreview(savedPreview);
+
+  if (savedOverlay) {
+    localStorage.setItem("overlay_url", savedOverlay);
+  }
+}, []);
+
+  useEffect(() => {
+    if (analysis) {
+      localStorage.setItem("analysis", JSON.stringify(analysis));
+    }
+  }, [analysis]);
+
+  useEffect(() => {
+    if (preview) {
+      localStorage.setItem("preview", preview);
+    }
+  }, [preview]);
+
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+
+  const handleFile = useCallback(async (file) => {
+    if (!file || !file.type.startsWith("image/")) return;
+
+    setImage(file);
+
+    const base64 = await fileToBase64(file);
+    setPreview(base64);
+
+    setAnalysis(null);
+    setProgress(0);
+    setStatus("idle");
+
+    localStorage.removeItem("analysis");
+    localStorage.removeItem("overlay_url");
+    localStorage.removeItem("glb_url");
+  }, []);
 
   const onDrop = useCallback((e) => {
     e.preventDefault()
@@ -48,23 +94,30 @@ export default function FaceAnalyzer() {
     handleFile(e.dataTransfer.files[0])
   }, [handleFile])
 
-  const onFileInput = (e) => handleFile(e.target.files[0])
+  const onFileInput = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    handleFile(file);
+
+    e.target.value = "";
+  };
 
   const analyze = async () => {
-    if (!image) return
-    setStatus('uploading')
-    setProgress(20)
+    if (!image) return;
+
+    setStatus("uploading");
+    setProgress(20);
+
+    const formData = new FormData();
+    formData.append("image", image);
 
     try {
-      const formData = new FormData()
-      const blob = await fetch(image).then(r => r.blob())
-      formData.append('image', blob, 'upload.jpg')
 
-      setStatus('analyzing')
-      setProgress(50)
+      const access_token = localStorage.getItem("access");
 
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 5000)
+      setStatus("analyzing");
+      setProgress(50);
 
       const res = await fetch('http://localhost:8000/api/analyze-generate/', {
         method: 'POST',
@@ -158,14 +211,40 @@ export default function FaceAnalyzer() {
         setStatus('results')
       }, 800)
     }
-  }
+  };
 
   const reset = () => {
-    setImage(null)
-    setResults(null)
-    setStatus('idle')
-    setProgress(0)
-  }
+    setImage(null);
+    setPreview(null);
+    setAnalysis(null);
+    setStatus("idle");
+    setProgress(0);
+
+    localStorage.removeItem("analysis");
+    localStorage.removeItem("preview");
+    localStorage.removeItem("overlay_url");
+    localStorage.removeItem("heatmap_url");
+    localStorage.removeItem("glb_url");
+  };
+
+  const score = analysis?.symmetry_analysis?.overall_score || 0;
+  const circumference = 2 * Math.PI * 52;
+  const offset = circumference - (score / 100) * circumference;
+  const metrics = analysis
+    ? Object.entries(analysis.symmetry_analysis.region_scores).map(
+      ([key, value]) => ({
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+        value,
+      })
+    )
+    : [];
+  const heatmapUrl =
+    analysis?.symmetry_analysis?.heatmap_image ||
+    localStorage.getItem("heatmap_url");
+
+  const overlayUrl =
+    analysis?.symmetry_analysis?.overlay_image ||
+    localStorage.getItem("overlay_url");
 
   return (
     <div className="analyzer-page">
@@ -174,7 +253,7 @@ export default function FaceAnalyzer() {
           <h2>Face Analyzer</h2>
           <p>Upload a front-facing photo for AI-powered symmetry analysis</p>
         </div>
-        {image && !results && (
+        {image && !analysis && (
           <button className="analyzer-reset" onClick={reset}>Clear</button>
         )}
       </div>
@@ -189,89 +268,97 @@ export default function FaceAnalyzer() {
         )}
       </div>
 
-      {!results ? (
-        <div className="analyzer-main">
-          <div
-            className={`analyzer-dropzone ${dragOver ? 'drag' : ''} ${image ? 'has-image' : ''}`}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
-          >
-            {image ? (
-              <div className="analyzer-preview">
-                <img src={image} alt="Preview" />
-                <div className="analyzer-preview-overlay">
-                  <button className="analyzer-change" onClick={() => document.getElementById('file-input').click()}>
-                    Change Photo
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="analyzer-dropzone-content">
-                <div className="analyzer-dropzone-icon">
-                  <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
-                  </svg>
-                </div>
-                <h3>Drag & drop your photo here</h3>
-                <p>or click to browse from your device</p>
-                <span className="analyzer-formats">Supports JPG, PNG, WEBP up to 10MB</span>
-                <input id="file-input" type="file" accept="image/*" onChange={onFileInput} hidden />
-                <button className="analyzer-browse" onClick={() => document.getElementById('file-input').click()}>
-                  Browse Files
+      <div className="analyzer-main">
+        <div
+          className={`analyzer-dropzone ${dragOver ? "drag" : ""} ${preview ? "has-image" : ""}`}
+        >
+          {/* Always mounted */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={onFileInput}
+          />
+
+          {preview ? (
+            <div className="analyzer-preview">
+              <img src={preview} alt="Preview" />
+
+              <div className="analyzer-preview-overlay">
+                <button
+                  className="analyzer-change"
+                  onClick={() => {
+                    fileInputRef.current.value = "";
+                    fileInputRef.current.click();
+                  }}
+                >
+                  Change Photo
                 </button>
               </div>
-            )}
-          </div>
-
-          {image && (
-            <div className="analyzer-actions">
+            </div>
+          ) : (
+            <div className="analyzer-dropzone-content">
+              ...
               <button
-                className="analyzer-analyze-btn"
-                onClick={analyze}
-                disabled={status === 'uploading' || status === 'analyzing'}
+                className="analyzer-browse"
+                onClick={() => fileInputRef.current.click()}
               >
-                {status === 'uploading' || status === 'analyzing' ? (
-                  <>
-                    <span className="analyzer-spinner" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10" />
-                    </svg>
-                    Analyze Face
-                  </>
-                )}
+                Browse Files
               </button>
             </div>
           )}
-
-          <div className="analyzer-tips">
-            <h4>Tips for best results:</h4>
-            <ul>
-              <li>Use a front-facing photo with good lighting</li>
-              <li>Keep a neutral expression and face the camera directly</li>
-              <li>Remove glasses and keep hair away from face</li>
-              <li>Ensure the photo is clear and not blurry</li>
-            </ul>
-          </div>
         </div>
-      ) : (
+
+        {preview && (
+          <div className="analyzer-actions">
+            <button
+              className="analyzer-analyze-btn"
+              onClick={analyze}
+              disabled={status === 'uploading' || status === 'analyzing'}
+            >
+              {status === 'uploading' || status === 'analyzing' ? (
+                <>
+                  <span className="analyzer-spinner" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10" />
+                  </svg>
+                  Analyze Face
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
+        <div className="analyzer-tips">
+          <h4>Tips for best results:</h4>
+          <ul>
+            <li>Use a front-facing photo with good lighting</li>
+            <li>Keep a neutral expression and face the camera directly</li>
+            <li>Remove glasses and keep hair away from face</li>
+            <li>Ensure the photo is clear and not blurry</li>
+          </ul>
+        </div>
+      </div>
+
+      {analysis && (
         <div className="analyzer-results">
           <div className="analyzer-results-grid">
             <div className="analyzer-card analyzer-original">
               <h3>Original Image</h3>
               <div className="analyzer-img-wrap">
-                <img src={image} alt="Original" />
+                <img src={preview} alt="Original" />
                 <div className="analyzer-scan-overlay" />
               </div>
             </div>
             <div className="analyzer-card analyzer-annotated">
               <h3>Annotated & Mirrored</h3>
               <div className="analyzer-img-wrap">
-                <img src={image} alt="Annotated" className="analyzer-mirror" />
+                <img src={preview} alt="Annotated" className="analyzer-mirror" />
                 <svg className="analyzer-landmarks" viewBox="0 0 300 300" preserveAspectRatio="none">
                   <line x1="150" y1="20" x2="150" y2="280" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
                   <line x1="20" y1="150" x2="280" y2="150" stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
@@ -282,17 +369,24 @@ export default function FaceAnalyzer() {
                 </svg>
               </div>
             </div>
+            <div className="analyzer-card analyzer-original">
+              <h3>Overlay Image</h3>
+              <div className="analyzer-img-wrap">
+                <img src={overlayUrl} alt="Overlay" />
+                <div className="analyzer-scan-overlay" />
+              </div>
+            </div>
           </div>
 
           <div className="analyzer-results-detail">
             <div className="analyzer-card analyzer-score-detail">
               <h3>Symmetry Breakdown</h3>
               <div className="analyzer-big-score">
-                <div className="analyzer-big-num">{Number(results.symmetryScore).toFixed(2)}%</div>
+                <div className="analyzer-big-num">{score.toFixed(1)}%</div>
                 <div className="analyzer-big-label">Overall Symmetry</div>
               </div>
               <div className="analyzer-metric-list">
-                {results.metrics.map((m) => (
+                {metrics.map((m) => (
                   <div className="analyzer-metric-item" key={m.label}>
                     <div className="analyzer-metric-head">
                       <span>{m.label}</span>
@@ -304,15 +398,12 @@ export default function FaceAnalyzer() {
                   </div>
                 ))}
               </div>
-              <div className="analyzer-landmark-info">
-                <span className="analyzer-landmark-badge">{results.landmarks || 68} landmarks detected</span>
-              </div>
             </div>
 
             <div className="analyzer-card analyzer-recs">
               <h3>AI Recommendations</h3>
               <div className="analyzer-rec-list">
-                {results.recommendations.map((r, i) => (
+                {mockResults.recommendations.map((r, i) => (
                   <div className="analyzer-rec-item" key={i}>
                     <div className="analyzer-rec-icon">
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">

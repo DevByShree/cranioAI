@@ -7,10 +7,12 @@ import FaceAnalyzer from './pages/FaceAnalyzer/FaceAnalyzer'
 import Visualization from './pages/Visualization/Visualization'
 import Progress from './pages/Progress/Progress'
 import Recommendations from './pages/Recommendations/Recommendations'
+import Excersise from './pages/Excersise/Excersise'
 import History from './pages/History/History'
 import Settings from './pages/Settings/Settings'
 import DashboardLayout from './layouts/DashboardLayout'
 import ProtectedRoute from "./components/ProtectedRoutes";
+import Profile from './pages/Settings/Profile/Profile' 
 
 export default function App() {
   return (
@@ -36,8 +38,11 @@ export default function App() {
           <Route path="visualization" element={<Visualization />} />
           <Route path="progress" element={<Progress />} />
           <Route path="recommendations" element={<Recommendations />} />
+          <Route path="excersise" element={<Excersise />} />
           <Route path="history" element={<History />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="settings/profile" element={<Profile />} />
+
         </Route>
 
         <Route path="*" element={<Navigate to="/" />} />
