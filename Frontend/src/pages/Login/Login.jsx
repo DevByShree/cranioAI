@@ -31,8 +31,8 @@ export default function Login() {
 
       console.log(response.data);
 
-      localStorage.setItem("access", response.data.access);
-      localStorage.setItem("refresh", response.data.refresh);
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
 
       localStorage.setItem(
         "user",
@@ -51,8 +51,8 @@ export default function Login() {
   });
   useEffect(() => {
     const token =
-      localStorage.getItem("access") ||
-      sessionStorage.getItem("access");
+      localStorage.getItem("access_token") ||
+      sessionStorage.getItem("access_token");
 
     if (token) {
       navigate("/dashboard");
@@ -91,11 +91,11 @@ export default function Login() {
         );
 
         if (rememberMe) {
-          localStorage.setItem("access", response.data.access);
-          localStorage.setItem("refresh", response.data.refresh);
+          localStorage.setItem("access_token", response.data.access);
+          localStorage.setItem("refresh_token", response.data.refresh);
         } else {
-          sessionStorage.setItem("access", response.data.access);
-          sessionStorage.setItem("refresh", response.data.refresh);
+          sessionStorage.setItem("access_token", response.data.access);
+          sessionStorage.setItem("refresh_token", response.data.refresh);
         }
 
 

@@ -18,7 +18,7 @@ export default function History() {
     const fetchHistory = async () => {
       try {
 
-        const access_token = localStorage.getItem('access');
+        const access_token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
 
         const response = await axios.get('http://localhost:8000/api/history/', {
           headers: {

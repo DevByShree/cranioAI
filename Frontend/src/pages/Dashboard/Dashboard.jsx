@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   const refreshDashboard = async () => {
     try {
-      const access_token = localStorage.getItem("access");
+      const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
       const response = await axios.get(
         "http://127.0.0.1:8000/api/dashboard/",
         {
